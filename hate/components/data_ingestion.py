@@ -34,7 +34,7 @@ class DataIngestion:
             with ZipFile(self.data_ingestion_config.ZIP_FILE_PATH, 'r') as zip_ref:
                 zip_ref.extractall(self.data_ingestion_config.ZIP_FILE_DIR)
             logging.info("Exiting the unzip_data method of the DataIngestion class..")
-            return self.data_ingestion_config.DATA_INGESTION_ARTIFACTS_DIR, self.data_ingestion_config.NEW_DATA_ARTIFACTS_DIR
+            return self.data_ingestion_config.DATA_ARTIFACTS_DIR, self.data_ingestion_config.NEW_DATA_ARTIFACTS_DIR
         except Exception as e:
             raise CustomException(e, sys) from e
 
@@ -51,7 +51,7 @@ class DataIngestion:
                 raw_data_file_path=raw_data_file_path
             )
             logging.info("Exiting the initiate_data_ingestion method of the DataIngestion class..")
-            logging.info(f"Data Ingestion Artifact: {data_ingestion_artifact}")
+            logging.info(f"Data Ingestion Artifact paths: {data_ingestion_artifact}")
             return data_ingestion_artifact
 
         except Exception as e:

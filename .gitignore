@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 artifacts/*
+flowchart/*
 # C extensions
 *.so
 

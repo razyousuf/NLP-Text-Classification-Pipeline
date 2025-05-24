@@ -2,8 +2,15 @@
 
 from dataclasses import dataclass
 
-
+# Returened constants and their specified data types for data ingestion
 @dataclass
 class DataIngestionArtifact:
     imbalance_data_file_path: str
     raw_data_file_path: str
+
+# Returned constants and their specified data types for data validation
+@dataclass
+class DataValidationArtifact:
+    imbalance_data_file_path: str
+    raw_data_file_path: str
+    is_validated: bool

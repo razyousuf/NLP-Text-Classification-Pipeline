@@ -16,5 +16,15 @@ class DataIngestionConfig:
         self.ZIP_FILE_DIR = os.path.join(self.DATA_INGESTION_ARTIFACTS_DIR)
         self.ZIP_FILE_PATH = os.path.join(self.DATA_INGESTION_ARTIFACTS_DIR, self.ZIP_FILE_NAME)
 
+# Data Validation Config
+@dataclass
+class DataValidationConfig:
+    def __init__(self):
+        self.SCHEMA_FILE_PATH: str = CONFIG_DIR
+        self.SCHEMA_FILE_NAME: str = SCHEMA_FILE_NAME
+        #self.DATA_VALIDATION_ARTIFACTS_DIR: str = os.path.join(os.getcwd(), ARTIFACTS_DIR, DATA_VALIDATION_ARTIFACTS_DIR)
+        #self.IMBALANCE_DATA_DIR: str = os.path.join(self.DATA_VALIDATION_ARTIFACTS_DIR, DATA_VALIDATION_IMBALANCE_DATA_DIR)
+        #self.RAW_DATA_DIR: str = os.path.join(self.DATA_VALIDATION_ARTIFACTS_DIR, DATA_VALIDATION_RAW_DATA_DIR)
+        self.SCHEMA_FILE_PATH: str = os.path.join(self.SCHEMA_FILE_PATH, self.SCHEMA_FILE_NAME)
 
 
