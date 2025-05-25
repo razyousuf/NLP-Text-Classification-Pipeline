@@ -39,7 +39,7 @@ class DataValidation:
         logging.info("Entering the initiate_data_validation method of the DataValidation class.")
         try:
             schema = self.read_yaml_schema()
-            column_types = schema["column_types"]
+            column_types = schema["column_groups"]
 
             imbalance_data_path = self.data_ingestion_artifact.imbalance_data_file_path
             raw_data_path = self.data_ingestion_artifact.raw_data_file_path
@@ -51,7 +51,7 @@ class DataValidation:
 
             for df, name in datasets:
                 if not self.validate_column_names(df, column_types[name], name):
-                    logging.error(f"Column validation failed for [{name}]. Please check the schema.")
+                    logging.error(f"Column validation failed for [{name}]. Please check the data columns.")
 
 
             data_validation_artifact = DataValidationArtifact(

@@ -1,4 +1,8 @@
-column_types:
+datasets:
+  imbalance_data: imbalance_data
+  raw_data: raw_data
+
+column_groups:
   imbalance_data:
     id: category
     label: category
@@ -12,6 +16,12 @@ column_types:
     neither: category
     class: category
     tweet: category
+
+targets:
+  imbalance_data:
+    - label
+  raw_data:
+    - class
 
 drop_columns:
   imbalance_data:

@@ -54,28 +54,34 @@ class DataTransformation:
     def raw_data_cleaning(self):
         try:
             logging.info("Entering the raw_data_cleaning method of the DataTransformation class.")
+             # Load file
             raw_data_path = self.data_validation_artifact.raw_data_file_path
             raw_data = pd.read_csv(raw_data_path)
-
             raw_data.dropna(inplace=True)
-            drop_columns = self.read_yaml_schema()["drop_columns"]["raw_data"] # Schema's drop part is list of strings only. 
+
+            # Read schema
+            schema = self.read_yaml_schema()
+            drop_columns = schema["drop_columns"]["raw_data"]
+            target_column = schema["targets"]["raw_data"][0]  # dynamically use the column named "class"
+            new_label_column = schema["targets"]["imbalance_data"][0]  # this is what you're renaming to ("label")
+
+            # Drop irrelevant columns
             raw_data.drop(
-                columns=drop_columns, 
-                axis=self.data_transformation_config.AXIS, 
+                columns=drop_columns,
+                axis=self.data_transformation_config.AXIS,
                 inplace=self.data_transformation_config.INPLACE
-                )
+            )
+            # Clean and relabel target
+            raw_data.loc[raw_data[target_column] == 1, target_column] = 1
+            raw_data.loc[raw_data[target_column] == 0, target_column] = 1
+            raw_data[target_column].replace({2: 0}, inplace=True)
 
-            # Copy the class 1 data to class 0
-            raw_data[raw_data[self.data_transformation_config.CLASS]==0][self.data_transformation_config.CLASS] = 1
-            # Replace the value of 0 to 1 in the class column
-            raw_data[self.data_transformation_config.CLASS].replace({0:1}, inplace=True)
-            # Replace the value of 2 to 0 in the class column
-            raw_data[self.data_transformation_config.CLASS].replace({2:0}, inplace=True)
+            # Rename column (e.g., "class" → "label")
+            raw_data.rename(columns={target_column: new_label_column}, inplace=True)
 
-            # Conver the name of the class into lablel
-            raw_data.rename(columns={self.data_transformation_config.CLASS: self.data_transformation_config.LABEL}, inplace=True)
-            logging.info("Exiting the raw_data_cleaning method and returned the raw_data {raw_data}.")
+            logging.info(f"Exiting the raw_data_cleaning method and returned the cleaned raw_data.")
             return raw_data
+        
         except Exception as e:
             raise CustomException(e, sys) from e
 
