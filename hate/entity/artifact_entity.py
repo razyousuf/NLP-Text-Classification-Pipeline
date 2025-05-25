@@ -14,3 +14,8 @@ class DataValidationArtifact:
     imbalance_data_file_path: str
     raw_data_file_path: str
     is_validated: bool
+
+# Returned constants and their specified data types for data transformation
+@dataclass
+class DataTransformationArtifact:
+    transformed_data_path: str

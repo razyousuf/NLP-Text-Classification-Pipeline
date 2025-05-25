@@ -11,6 +11,13 @@ raw_data_columns:
   - neither: category
   - class: category
   - tweet: category
-#drop_columns:
-#  - case_id
-#  - yr_of_estab
+
+drop_imbalance_data_columns:
+  - id
+
+drop_raw_data_columns:
+  - "Unnamed: 0"
+  - count
+  - hate_speech
+  - offensive_language
+  - neither

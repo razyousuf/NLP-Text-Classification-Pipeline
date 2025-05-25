@@ -3,14 +3,18 @@ from hate.logger import logging
 from hate.exception import CustomException
 from hate.components.data_ingestion import DataIngestion
 from hate.components.data_validation import DataValidation
+from hate.components.data_transformation import DataTransformation
+
 
 from hate.entity.config_entity import (DataIngestionConfig,
-                                       DataValidationConfig
+                                       DataValidationConfig,
+                                       DataTransformationConfig
                                        )
 
 
 from hate.entity.artifact_entity import (DataIngestionArtifact,
-                                        DataValidationArtifact
+                                        DataValidationArtifact,
+                                        DataTransformationArtifact
                                         )
 
 
@@ -18,6 +22,7 @@ class TrainingPipeline:
     def __init__(self):
         self.data_ingestion_config = DataIngestionConfig()
         self.data_validation_config = DataValidationConfig()
+        self.data_transformation_config = DataTransformationConfig()
 
 
     def start_data_ingestion(self) -> DataIngestionArtifact:
@@ -46,6 +51,8 @@ class TrainingPipeline:
         except Exception as e:
             raise CustomException(e, sys) from e
 
+    # Let's
+    def start_data_transformatio
 
 
     def run_pipeline(self):

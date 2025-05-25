@@ -27,4 +27,16 @@ class DataValidationConfig:
         #self.RAW_DATA_DIR: str = os.path.join(self.DATA_VALIDATION_ARTIFACTS_DIR, DATA_VALIDATION_RAW_DATA_DIR)
         self.SCHEMA_FILE_PATH: str = os.path.join(self.SCHEMA_FILE_PATH, self.SCHEMA_FILE_NAME)
 
+# Data Transformation Config
+@dataclass
+class DataTransformationConfig:
+    def __init__(self):
+        self.DATA_TRANSFORMATION_ARTIFACTS_DIR: str = os.path.join(os.getcwd(), ARTIFACTS_DIR, DATA_TRANSFORMATION_ARTIFACTS_DIR)
+        #self.TRANSFORMED_FILE_NAME: str = TRANSFORMED_FILE_NAME
+        self.TRANSFORMED_FILE_PATH: str = os.path.join(self.DATA_TRANSFORMATION_ARTIFACTS_DIR, TRANSFORMED_FILE_NAME)
 
+        self.AXIS: int = AXIS
+        self.INPLACE: bool = INPLACE
+        self.CLASS: str = CLASS
+        self.LABEL: str = LABEL
+        self.TWEET: str = TWEET

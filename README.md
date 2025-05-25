@@ -1,5 +1,12 @@
 # NLP-Text-Classification-Pipeline
 
+## Stages
+
+1. Data Ingestion
+2. Data Validation
+3. Data Trnsformation
+4.
+
 ## Workflows
 
 1. constants
