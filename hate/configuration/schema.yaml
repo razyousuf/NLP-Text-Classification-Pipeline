@@ -1,23 +1,24 @@
-imbalance_data_columns:
-  - id: category
-  - label: category
-  - tweet: category
+column_types:
+  imbalance_data:
+    id: category
+    label: category
+    tweet: category
 
-raw_data_columns:
-  - "Unnamed: 0": category
-  - count: category
-  - hate_speech: category
-  - offensive_language: category
-  - neither: category
-  - class: category
-  - tweet: category
+  raw_data:
+    "Unnamed: 0": category
+    count: category
+    hate_speech: category
+    offensive_language: category
+    neither: category
+    class: category
+    tweet: category
 
-drop_imbalance_data_columns:
-  - id
-
-drop_raw_data_columns:
-  - "Unnamed: 0"
-  - count
-  - hate_speech
-  - offensive_language
-  - neither
+drop_columns:
+  imbalance_data:
+    - id
+  raw_data:
+    - "Unnamed: 0"
+    - count
+    - hate_speech
+    - offensive_language
+    - neither

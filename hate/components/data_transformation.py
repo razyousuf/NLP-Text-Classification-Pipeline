@@ -38,7 +38,12 @@ class DataTransformation:
             imbalance_data = pd.read_csv(imbalance_data_path)
 
             imbalance_data.dropna(inplace=True)
-            imbalance_data.drop(self.read_yaml_schema()['imbalance_data_columns'][0].keys(), axis=self.data_transformation_config.AXIS, inplace=self.data_transformation_config.INPLACE)
+            drop_cols = self.read_yaml_schema()["drop_columns"]["imbalance_data"]
+            imbalance_data.drop(
+                columns=drop_cols, 
+                axis=self.data_transformation_config.AXIS, 
+                inplace=self.data_transformation_config.INPLACE
+                )
             
             logging.info("Exiting the imbalance_data_cleaning method and returned the imbalance data {imbalance_data}.")
             return imbalance_data
@@ -53,8 +58,12 @@ class DataTransformation:
             raw_data = pd.read_csv(raw_data_path)
 
             raw_data.dropna(inplace=True)
-            drop_columns = self.read_yaml_schema()['drop_raw_data_columns'] # Schema's drop part is list of strings only. 
-            raw_data.drop(drop_columns, axis=self.data_transformation_config.AXIS, inplace=self.data_transformation_config.INPLACE)
+            drop_columns = self.read_yaml_schema()["drop_columns"]["raw_data"] # Schema's drop part is list of strings only. 
+            raw_data.drop(
+                columns=drop_columns, 
+                axis=self.data_transformation_config.AXIS, 
+                inplace=self.data_transformation_config.INPLACE
+                )
 
             # Copy the class 1 data to class 0
             raw_data[raw_data[self.data_transformation_config.CLASS]==0][self.data_transformation_config.CLASS] = 1
