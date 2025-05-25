@@ -33,3 +33,23 @@ DATA_DIR = "data"
 AXIS = 1
 INPLACE = True
 CLASS = "class"
+
+# Model Training constants
+MODEL_TRAINER_ARTIFACTS_DIR = "ModelTrainerArtifacts"
+TRAINED_MODEL_DIR = "trained_model"
+TRAINED_MODEL_NAME = "model.h5"
+X_TEST_FILE_NAME = "X_test.csv"
+Y_TEST_FILE_NAME = "Y_test.csv"
+X_TRAIN_FILE_NAME = "X_train.csv"
+
+RANDOM_STATE = 42
+EPOCHS = 1
+BATCH_SIZE = 128
+VALIDATION_SPLIT = 0.2
+
+# Model Architecture constants
+MAX_WORDS = 50000
+MAX_LEN = 300
+LOSS = "binary_crossentropy"
+METRICS = ["accuracy"]
+ACTIVATION = "sigmoid"

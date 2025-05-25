@@ -10,7 +10,7 @@ import re
 import nltk
 from nltk.corpus import stopwords
 nltk.download('stopwords')
-from sklearn.model_selection import train_test_split
+#from sklearn.model_selection import train_test_split
 
 from hate.constants import *
 from hate.entity.config_entity import DataTransformationConfig, DataValidationConfig

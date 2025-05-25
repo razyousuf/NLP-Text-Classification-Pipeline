@@ -5,7 +5,8 @@
 1. Data Ingestion
 2. Data Validation
 3. Data Trnsformation
-4.
+4. Model Training
+5.
 
 ## Workflows
 

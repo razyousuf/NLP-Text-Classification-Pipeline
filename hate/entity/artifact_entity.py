@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-# Returened constants and their specified data types for data ingestion
+# Returened constants and their specified data types for data ingestion (for the next component)
 @dataclass
 class DataIngestionArtifact:
     imbalance_data_file_path: str
@@ -15,7 +15,13 @@ class DataValidationArtifact:
     raw_data_file_path: str
     is_validated: bool
 
-# Returned constants and their specified data types for data transformation
 @dataclass
 class DataTransformationArtifact:
     transformed_data_path: str
+
+
+@dataclass
+class ModelTrainerArtifacts: 
+    trained_model_path:str
+    x_test_path: list
+    y_test_path: list
