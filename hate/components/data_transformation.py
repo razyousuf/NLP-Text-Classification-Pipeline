@@ -13,7 +13,7 @@ nltk.download('stopwords')
 from sklearn.model_selection import train_test_split
 
 from hate.constants import *
-from hate.entity.config_entity import DataTransformationConfig
+from hate.entity.config_entity import DataTransformationConfig, DataValidationConfig
 from hate.entity.artifact_entity import DataTransformationArtifact, DataIngestionArtifact
 from hate.components.data_validation import DataValidationArtifact
 
@@ -21,10 +21,11 @@ class DataTransformation:
     def __init__(self, data_transformation_config: DataTransformationConfig, data_validation_artifact: DataValidationArtifact):
         self.data_transformation_config = data_transformation_config
         self.data_validation_artifact = data_validation_artifact
+        self.data_validation_config = DataValidationConfig()
 
     def read_yaml_schema(self):
         try:
-            with open(self.data_transformation_config.SCHEMA_FILE_PATH, 'r') as file:
+            with open(self.data_validation_config.SCHEMA_FILE_PATH, 'r') as file:
                 schema = yaml.safe_load(file)
             return schema
         except Exception as e:
@@ -52,7 +53,7 @@ class DataTransformation:
             raw_data = pd.read_csv(raw_data_path)
 
             raw_data.dropna(inplace=True)
-            drop_columns = [list(col_dict.keys())[0] for col_dict in self.read_yaml_schema()['drop_raw_data_columns'].items()]
+            drop_columns = self.read_yaml_schema()['drop_raw_data_columns'] # Schema's drop part is list of strings only. 
             raw_data.drop(drop_columns, axis=self.data_transformation_config.AXIS, inplace=self.data_transformation_config.INPLACE)
 
             # Copy the class 1 data to class 0

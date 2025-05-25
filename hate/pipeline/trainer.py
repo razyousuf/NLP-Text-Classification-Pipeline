@@ -51,8 +51,21 @@ class TrainingPipeline:
         except Exception as e:
             raise CustomException(e, sys) from e
 
-    # Let's
-    def start_data_transformatio
+    def start_data_transformation(self, data_validation_artifact =  DataValidationArtifact) -> DataTransformationArtifact:
+        logging.info("Entered the start_data_transformation method of TrainPipeline class")
+        try:
+            data_transformation = DataTransformation(
+                data_validation_artifact = data_validation_artifact,
+                data_transformation_config=self.data_transformation_config
+            )
+
+            data_transformation_artifacts = data_transformation.initiate_data_transformation()
+            
+            logging.info("Exited the start_data_transformation method of TrainPipeline class")
+            return data_transformation_artifacts
+
+        except Exception as e:
+            raise CustomException(e, sys) from e
 
 
     def run_pipeline(self):
@@ -61,6 +74,9 @@ class TrainingPipeline:
             data_ingestion_artifact = self.start_data_ingestion()
             logging.info("Exited the run_pipeline method of the TrainingPipeline class..")
             data_validation_artifact = self.start_data_validation(data_ingestion_artifact)
-            logging.info("Data validation completed successfully.")
+            data_transformation_artifacts = self.start_data_transformation(
+                data_validation_artifact=data_validation_artifact
+            )
+            logging.info("Data transformation completed successfully.")
         except Exception as e:
             raise CustomException(e, sys) from e
