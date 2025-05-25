@@ -1,6 +1,6 @@
 datasets:
-  imbalance_data: imbalance_data
-  raw_data: raw_data
+  imbalance_data: imbalance_data.csv
+  raw_data: raw_data.csv
 
 column_groups:
   imbalance_data:

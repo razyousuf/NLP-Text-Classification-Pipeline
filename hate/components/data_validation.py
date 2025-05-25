@@ -10,6 +10,7 @@ from hate.constants import *
 from hate.entity.config_entity import DataValidationConfig
 from hate.entity.artifact_entity import DataValidationArtifact
 from hate.components.data_ingestion import DataIngestionArtifact
+from hate.configuration.schema_config import SchemaConfig
 
 
 class DataValidation:
@@ -25,41 +26,48 @@ class DataValidation:
         except Exception as e:
             raise CustomException(e, sys) from e
 
-    def validate_column_names(self, df: pd.DataFrame, schema_columns: dict[str, str], schema_name: str) -> bool:
-        expected_columns = list(schema_columns.keys())
+    def validate_column_names(self, df: pd.DataFrame, expected_schema: dict[str, str], schema_name: str) -> bool:
+        expected_columns = list(expected_schema.keys())
         actual_columns = list(df.columns)
 
-        logging.info(f"Expected columns in [{schema_name}] are: {expected_columns}")
-        logging.info(f"Actual columns in the DataFrame are: {actual_columns}")
+        logging.info(f"Expected columns in [{schema_name}]: {expected_columns}")
+        logging.info(f"Actual columns in the DataFrame: {actual_columns}")
 
         return expected_columns == actual_columns
+
 
     
     def initiate_data_validation(self) -> DataValidationArtifact:
         logging.info("Entering the initiate_data_validation method of the DataValidation class.")
         try:
+            # Load schema and wrap with SchemaConfig
             schema = self.read_yaml_schema()
-            column_types = schema["column_groups"]
+            schema_cfg = SchemaConfig(schema)
 
-            imbalance_data_path = self.data_ingestion_artifact.imbalance_data_file_path
-            raw_data_path = self.data_ingestion_artifact.raw_data_file_path
-            # Load both datasets as tuples of (DataFrame, schema_key)
-            datasets = [
-                (pd.read_csv(imbalance_data_path), "imbalance_data"),
-                (pd.read_csv(raw_data_path), "raw_data")
-            ]
+            # Automatically resolve paths and roles
+            dataset_roles = ["raw_data", "imbalance_data"]
+            dataset_paths = {
+                "raw_data": self.data_ingestion_artifact.raw_data_file_path,
+                "imbalance_data": self.data_ingestion_artifact.imbalance_data_file_path
+            }
 
-            for df, name in datasets:
-                if not self.validate_column_names(df, column_types[name], name):
-                    logging.error(f"Column validation failed for [{name}]. Please check the data columns.")
+            # Validate columns for each dataset dynamically
+            for role in dataset_roles:
+                dataset_key = schema_cfg.get_dataset_key(role)
+                df = pd.read_csv(dataset_paths[role])
+                expected_columns = schema_cfg.get_column_groups(role)
 
+                if not self.validate_column_names(df, expected_columns, dataset_key):
+                    raise ValueError(f"Column validation failed for [{dataset_key}]. Check schema or data format.")
 
+            # All validations passed
             data_validation_artifact = DataValidationArtifact(
-                imbalance_data_file_path=imbalance_data_path,
-                raw_data_file_path=raw_data_path,
+                imbalance_data_file_path=dataset_paths["imbalance_data"],
+                raw_data_file_path=dataset_paths["raw_data"],
                 is_validated=True
             )
 
+            logging.info("Data validation completed successfully.")
             return data_validation_artifact
 
         except Exception as e:

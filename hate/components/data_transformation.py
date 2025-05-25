@@ -16,6 +16,7 @@ from hate.constants import *
 from hate.entity.config_entity import DataTransformationConfig, DataValidationConfig
 from hate.entity.artifact_entity import DataTransformationArtifact, DataIngestionArtifact
 from hate.components.data_validation import DataValidationArtifact
+from hate.configuration.schema_config import SchemaConfig
 
 class DataTransformation:
     def __init__(self, data_transformation_config: DataTransformationConfig, data_validation_artifact: DataValidationArtifact):
@@ -34,52 +35,57 @@ class DataTransformation:
     def imbalance_data_cleaning(self):
         try:
             logging.info("Entering the imbalance_data_cleaning method of the DataTransformation class.")
+
+            # Load YAML schema and use SchemaConfig abstraction
+            schema = self.read_yaml_schema()
+            schema_cfg = SchemaConfig(schema)
+
+            # Dynamically resolve dataset role and paths
+            cleaned_key = schema_cfg.get_dataset_key("imbalance_data")
+            drop_cols = schema_cfg.get_drop_columns("imbalance_data")
+
+            # Load the imbalance data using dynamic key
             imbalance_data_path = self.data_validation_artifact.imbalance_data_file_path
             imbalance_data = pd.read_csv(imbalance_data_path)
 
+            # Clean the data
             imbalance_data.dropna(inplace=True)
-            drop_cols = self.read_yaml_schema()["drop_columns"]["imbalance_data"]
             imbalance_data.drop(
-                columns=drop_cols, 
-                axis=self.data_transformation_config.AXIS, 
+                columns=drop_cols,
+                axis=self.data_transformation_config.AXIS,
                 inplace=self.data_transformation_config.INPLACE
-                )
-            
-            logging.info("Exiting the imbalance_data_cleaning method and returned the imbalance data {imbalance_data}.")
+            )
+
+            logging.info("Exiting the imbalance_data_cleaning method successfully.")
             return imbalance_data
 
         except Exception as e:
             raise CustomException(e, sys) from e
+
         
     def raw_data_cleaning(self):
         try:
             logging.info("Entering the raw_data_cleaning method of the DataTransformation class.")
-             # Load file
+            schema = self.read_yaml_schema()
+            schema_cfg = SchemaConfig(schema)
+
+            raw_key = schema_cfg.get_dataset_key("raw_data")
+            cleaned_key = schema_cfg.get_dataset_key("imbalance_data")
+
+            target_col = schema_cfg.get_target_column("raw_data")
+            label_col = schema_cfg.get_target_column("imbalance_data")
+            drop_cols = schema_cfg.get_drop_columns("raw_data")
+
             raw_data_path = self.data_validation_artifact.raw_data_file_path
             raw_data = pd.read_csv(raw_data_path)
+
             raw_data.dropna(inplace=True)
+            raw_data.drop(columns=drop_cols, axis=self.data_transformation_config.AXIS, inplace=True)
 
-            # Read schema
-            schema = self.read_yaml_schema()
-            drop_columns = schema["drop_columns"]["raw_data"]
-            target_column = schema["targets"]["raw_data"][0]  # dynamically use the column named "class"
-            new_label_column = schema["targets"]["imbalance_data"][0]  # this is what you're renaming to ("label")
+            raw_data[target_col].replace({0: 1, 1: 1, 2: 0}, inplace=True)  # This merges class 0 and class 1 into new class 1, and converts class 2 → 0.
+            raw_data.rename(columns={target_col: label_col}, inplace=True)
 
-            # Drop irrelevant columns
-            raw_data.drop(
-                columns=drop_columns,
-                axis=self.data_transformation_config.AXIS,
-                inplace=self.data_transformation_config.INPLACE
-            )
-            # Clean and relabel target
-            raw_data.loc[raw_data[target_column] == 1, target_column] = 1
-            raw_data.loc[raw_data[target_column] == 0, target_column] = 1
-            raw_data[target_column].replace({2: 0}, inplace=True)
-
-            # Rename column (e.g., "class" → "label")
-            raw_data.rename(columns={target_column: new_label_column}, inplace=True)
-
-            logging.info(f"Exiting the raw_data_cleaning method and returned the cleaned raw_data.")
+            logging.info("Cleaned and returned raw_data")
             return raw_data
         
         except Exception as e:
