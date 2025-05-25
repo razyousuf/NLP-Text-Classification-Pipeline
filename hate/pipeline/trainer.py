@@ -5,18 +5,24 @@ from hate.components.data_ingestion import DataIngestion
 from hate.components.data_validation import DataValidation
 from hate.components.data_transformation import DataTransformation
 from hate.components.model_trainer import ModelTrainer
+from hate.components.model_evaluation import ModelEvaluation
+from hate.components.model_pusher import ModelPusher
 
 from hate.entity.config_entity import (DataIngestionConfig,
                                        DataValidationConfig,
                                        DataTransformationConfig,
-                                       ModelTrainerConfig
+                                       ModelTrainerConfig,
+                                       ModelEvaluationConfig,
+                                       ModelPusherConfig
                                        )
 
 
 from hate.entity.artifact_entity import (DataIngestionArtifact,
                                         DataValidationArtifact,
                                         DataTransformationArtifact,
-                                        ModelTrainerArtifacts
+                                        ModelTrainerArtifacts,
+                                        ModelEvaluationArtifacts,
+                                        ModelPusherArtifact
                                         )
 
 
@@ -26,6 +32,8 @@ class TrainingPipeline:
         self.data_validation_config = DataValidationConfig()
         self.data_transformation_config = DataTransformationConfig()
         self.model_trainer_config = ModelTrainerConfig()
+        self.model_evaluation_config = ModelEvaluationConfig()
+        self.model_pusher_config = ModelPusherConfig()
 
 
     def start_data_ingestion(self) -> DataIngestionArtifact:
@@ -85,6 +93,38 @@ class TrainingPipeline:
         except Exception as e:
             raise CustomException(e, sys) from e
 
+
+    def start_model_evaluation(self, model_trainer_artifacts: ModelTrainerArtifacts, data_transformation_artifact: DataTransformationArtifact) -> ModelEvaluationArtifacts:
+        logging.info("Entered the start_model_evaluation method of TrainPipeline class")
+        try:
+            model_evaluation = ModelEvaluation(
+                model_evaluation_config=self.model_evaluation_config,
+                data_transformation_artifact=data_transformation_artifact,
+                model_trainer_artifacts=model_trainer_artifacts
+            )
+
+            model_evaluation_artifacts = model_evaluation.initiate_model_evaluation()
+            logging.info("Exited the start_model_evaluation method of TrainPipeline class")
+            return model_evaluation_artifacts
+
+        except Exception as e:
+            raise CustomException(e, sys) from e
+
+
+    def start_model_pusher(self) -> ModelPusherArtifact:
+        logging.info("Entered the start_model_pusher method of TrainPipeline class")
+        try:
+            model_pusher = ModelPusher(
+                model_pusher_config=self.model_pusher_config
+            )
+
+            model_pusher_artifacts = model_pusher.initiate_model_pusher()
+            logging.info("Exited the start_model_pusher method of TrainPipeline class")
+            return model_pusher_artifacts
+
+        except Exception as e:
+            raise CustomException(e, sys) from e
+
     def run_pipeline(self):
         logging.info("Entered the run_pipeline method of the TrainingPipeline class..")
         try:
@@ -94,7 +134,21 @@ class TrainingPipeline:
             data_transformation_artifacts = self.start_data_transformation(
                 data_validation_artifact=data_validation_artifact
             )
+            
             model_trainer_artifacts = self.start_model_trainer(data_transformation_artifacts=data_transformation_artifacts) # takes data transformation artifacts as input (transformed data)
+
+            model_evaluation_artifacts = self.start_model_evaluation(
+                model_trainer_artifacts=model_trainer_artifacts,
+                data_transformation_artifact=data_transformation_artifacts
+            )
+
+
+            # Condition to push the best model only!
+            if not model_evaluation_artifacts.is_model_accepted:
+                raise Exception ("Trained model is NOT better that the Gcloud one")  
+
+            model_pusher_artifacts = self.start_model_pusher()     
+
             logging.info("Data transformation completed successfully.")
         except Exception as e:
             raise CustomException(e, sys) from e

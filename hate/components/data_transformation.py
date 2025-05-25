@@ -23,6 +23,9 @@ class DataTransformation:
         self.data_transformation_config = data_transformation_config
         self.data_validation_artifact = data_validation_artifact
         self.data_validation_config = DataValidationConfig()
+        
+        self.stemmer = nltk.SnowballStemmer('english')
+        self.stop_words = set(stopwords.words('english'))
 
     def read_yaml_schema(self):
         try:
@@ -72,8 +75,8 @@ class DataTransformation:
             #raw_key = schema_cfg.get_dataset_key("raw_data")
             #cleaned_key = schema_cfg.get_dataset_key("imbalance_data")
 
-            target_col = schema_cfg.get_target_column("raw_data")
-            label_col = schema_cfg.get_target_column("imbalance_data")
+            target_col_raw = schema_cfg.get_target_column("raw_data")
+            target_col_imbalance = schema_cfg.get_target_column("imbalance_data")
             drop_cols = schema_cfg.get_drop_columns("raw_data")
 
             raw_data_path = self.data_validation_artifact.raw_data_file_path
@@ -82,8 +85,14 @@ class DataTransformation:
             raw_data.dropna(inplace=True)
             raw_data.drop(columns=drop_cols, axis=self.data_transformation_config.AXIS, inplace=True)
 
-            raw_data[target_col] = raw_data[target_col].replace({0: 1, 1: 1, 2: 0})  # This merges class 0 and class 1 into new class 1, and converts class 2 → 0.
-            raw_data.rename(columns={target_col: label_col}, inplace=True)
+            # Add class 1 to class 0
+            raw_data[raw_data[target_col_raw] == 0] [target_col_raw] = 1
+            # Replace the value 0  → 1
+            raw_data[target_col_raw].replace({0:1}, inplace=True)
+            # Replace class 2 → 0
+            raw_data[target_col_raw].replace({2: 0}, inplace=True)
+    
+            raw_data.rename(columns={target_col_raw: target_col_imbalance}, inplace=True)
 
             logging.info("Cleaned and returned raw_data")
             return raw_data
@@ -103,8 +112,8 @@ class DataTransformation:
             raise CustomException(e, sys) from e
 
     def concat_data_cleaning(self, words):
+        logging.info("Entering the concat_data_cleaning method of the DataTransformation class.")
         try:
-            logging.info("Entering the concat_data_cleaning method of the DataTransformation class.")
             # Apply stemmer and stopwords removal on the data
             stemmer = nltk.SnowballStemmer('english')
             stop_words = set(stopwords.words('english'))
@@ -116,13 +125,12 @@ class DataTransformation:
             words = re.sub('<.*?>+', '', words)  # Remove HTML tags
             words = re.sub('\n', '', words)  # Remove new lines
             words = re.sub('\s+', ' ', words).strip()  # Remove extra spaces
-            words = [word for word in words.split(' ') if word not in stop_words] # Remove stopwords
+            words = [word for word in words.split(' ') if word not in self.stop_words]
             words = " ".join(words) # Join the words back into a single string
-            words = [stemmer.stem(words) for words in words.split(' ')]  # Apply stemming
-            words = " ".join(words)  
+            words = [self.stemmer.stem(word) for word in words] # Apply stemming
+            words = " ".join(words) 
             logging.info("Exiting the concat_data_cleaning method and returned the cleaned data.")
             return words
-
 
         except Exception as e:
             raise CustomException(e, sys) from e

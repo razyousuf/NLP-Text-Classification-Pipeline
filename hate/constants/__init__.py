@@ -53,3 +53,16 @@ MAX_LEN = 300
 LOSS = "binary_crossentropy"
 METRICS = ["accuracy"]
 ACTIVATION = "sigmoid"
+
+# Model Evaluation constants
+MODEL_EVALUATION_ARTIFACTS_DIR = "ModelEvaluationArtifacts"
+BEST_MODEL_DIR = "best_model"
+MODEL_EVALUATION_FILE_NAME = "loss.csv"
+
+MODEL_NAME = "model.h5"
+APP_HOST = "0.0.0.0"
+APP_PORT = 8080
+
+
+# Model Pusher constants
+    # No need any new constants, as we now have them all
