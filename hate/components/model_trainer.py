@@ -55,7 +55,7 @@ class ModelTrainer:
             tokenizer = Tokenizer(num_words=self.model_trainer_config.MAX_WORDS)
             tokenizer.fit_on_texts(x_train)
             sequences = tokenizer.texts_to_sequences(x_train)
-            logging.info(f"converting text to sequences: {sequences}")
+            logging.info(f"converting text to sequences") #: {sequences}")
             sequences_matrix = pad_sequences(sequences,maxlen=self.model_trainer_config.MAX_LEN)
             logging.info(f" The sequence matrix is: {sequences_matrix}")
             return sequences_matrix,tokenizer

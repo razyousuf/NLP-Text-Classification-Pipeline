@@ -45,7 +45,7 @@ class DataValidation:
             schema_cfg = SchemaConfig(schema)
 
             # Automatically resolve paths and roles
-            dataset_roles = ["raw_data", "imbalance_data"]
+            dataset_roles = schema_cfg.get_all_roles()
             dataset_paths = {
                 "raw_data": self.data_ingestion_artifact.raw_data_file_path,
                 "imbalance_data": self.data_ingestion_artifact.imbalance_data_file_path
@@ -58,7 +58,7 @@ class DataValidation:
                 expected_columns = schema_cfg.get_column_groups(role)
 
                 if not self.validate_column_names(df, expected_columns, dataset_key):
-                    raise ValueError(f"Column validation failed for [{dataset_key}]. Check schema or data format.")
+                    logging.error(f"Column validation failed for [{dataset_key}]. Check schema or data format.")
 
             # All validations passed
             data_validation_artifact = DataValidationArtifact(

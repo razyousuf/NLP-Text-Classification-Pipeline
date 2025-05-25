@@ -41,7 +41,7 @@ class DataTransformation:
             schema_cfg = SchemaConfig(schema)
 
             # Dynamically resolve dataset role and paths
-            cleaned_key = schema_cfg.get_dataset_key("imbalance_data")
+            #cleaned_key = schema_cfg.get_dataset_key("imbalance_data")
             drop_cols = schema_cfg.get_drop_columns("imbalance_data")
 
             # Load the imbalance data using dynamic key
@@ -69,8 +69,8 @@ class DataTransformation:
             schema = self.read_yaml_schema()
             schema_cfg = SchemaConfig(schema)
 
-            raw_key = schema_cfg.get_dataset_key("raw_data")
-            cleaned_key = schema_cfg.get_dataset_key("imbalance_data")
+            #raw_key = schema_cfg.get_dataset_key("raw_data")
+            #cleaned_key = schema_cfg.get_dataset_key("imbalance_data")
 
             target_col = schema_cfg.get_target_column("raw_data")
             label_col = schema_cfg.get_target_column("imbalance_data")
@@ -82,7 +82,7 @@ class DataTransformation:
             raw_data.dropna(inplace=True)
             raw_data.drop(columns=drop_cols, axis=self.data_transformation_config.AXIS, inplace=True)
 
-            raw_data[target_col].replace({0: 1, 1: 1, 2: 0}, inplace=True)  # This merges class 0 and class 1 into new class 1, and converts class 2 → 0.
+            raw_data[target_col] = raw_data[target_col].replace({0: 1, 1: 1, 2: 0})  # This merges class 0 and class 1 into new class 1, and converts class 2 → 0.
             raw_data.rename(columns={target_col: label_col}, inplace=True)
 
             logging.info("Cleaned and returned raw_data")
