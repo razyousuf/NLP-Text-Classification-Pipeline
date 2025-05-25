@@ -46,7 +46,7 @@ class DataTransformation:
             # Dynamically resolve dataset role and paths
             #cleaned_key = schema_cfg.get_dataset_key("imbalance_data")
             drop_cols = schema_cfg.get_drop_columns("imbalance_data")
-
+            
             # Load the imbalance data using dynamic key
             imbalance_data_path = self.data_validation_artifact.imbalance_data_file_path
             imbalance_data = pd.read_csv(imbalance_data_path)
@@ -58,7 +58,7 @@ class DataTransformation:
                 axis=self.data_transformation_config.AXIS,
                 inplace=self.data_transformation_config.INPLACE
             )
-
+            
             logging.info("Exiting the imbalance_data_cleaning method successfully.")
             return imbalance_data
 
@@ -84,7 +84,6 @@ class DataTransformation:
 
             raw_data.dropna(inplace=True)
             raw_data.drop(columns=drop_cols, axis=self.data_transformation_config.AXIS, inplace=True)
-
             # Add class 1 to class 0
             raw_data[raw_data[target_col_raw] == 0] [target_col_raw] = 1
             # Replace the value 0  → 1
@@ -111,26 +110,31 @@ class DataTransformation:
         except Exception as e:
             raise CustomException(e, sys) from e
 
-    def concat_data_cleaning(self, words):
-        logging.info("Entering the concat_data_cleaning method of the DataTransformation class.")
+    def concat_data_cleaning(self, text):
+        #logging.info("Entering the concat_data_cleaning method of the DataTransformation class.")
         try:
-            # Apply stemmer and stopwords removal on the data
-            stemmer = nltk.SnowballStemmer('english')
-            stop_words = set(stopwords.words('english'))
-            words = str(words).lower()
-            words = re.sub('\[.*?\]', '', words)  # Remove text in square brackets
-            words = re.sub('[%s]' % re.escape(string.punctuation), '', words)  # Remove punctuation
-            words = re.sub('\w*\d\w*', '', words)  # Remove words containing numbers
-            words = re.sub('http\S+|www\S+|https\S+', '', words, flags=re.MULTILINE)  # Remove URLs
-            words = re.sub('<.*?>+', '', words)  # Remove HTML tags
-            words = re.sub('\n', '', words)  # Remove new lines
-            words = re.sub('\s+', ' ', words).strip()  # Remove extra spaces
-            words = [word for word in words.split(' ') if word not in self.stop_words]
-            words = " ".join(words) # Join the words back into a single string
-            words = [self.stemmer.stem(word) for word in words] # Apply stemming
-            words = " ".join(words) 
-            logging.info("Exiting the concat_data_cleaning method and returned the cleaned data.")
-            return words
+            # Convert to lowercase
+            text = str(text).lower()
+
+            # Clean unwanted patterns
+            text = re.sub(r'\[.*?\]', '', text)  # Remove text in square brackets
+            text = re.sub(f"[{re.escape(string.punctuation)}]", '', text)  # Remove punctuation
+            text = re.sub(r'\w*\d\w*', '', text)  # Remove words containing numbers
+            text = re.sub(r'http\S+|www\S+|https\S+', '', text)  # Remove URLs
+            text = re.sub(r'<.*?>+', '', text)  # Remove HTML tags
+            text = re.sub(r'\n', ' ', text)  # Remove new lines
+            text = re.sub(r'\s+', ' ', text).strip()  # Normalize spaces
+
+            # Tokenize, remove stopwords
+            tokens = [word for word in text.split() if word not in self.stop_words]
+
+            # Stem each word
+            stemmed_tokens = [self.stemmer.stem(word) for word in tokens]
+
+            # Rejoin cleaned tokens into string
+            cleaned_text = " ".join(stemmed_tokens)
+
+            return cleaned_text
 
         except Exception as e:
             raise CustomException(e, sys) from e
@@ -143,7 +147,9 @@ class DataTransformation:
             self.raw_data_cleaning()
             df = self.concat_dataframe()
             df[self.data_transformation_config.TWEET] = df[self.data_transformation_config.TWEET].apply(self.concat_data_cleaning)
-
+            
+            logging.info(f"transformed data: {df.head()}, shape: {df.shape}")
+            
             os.makedirs(self.data_transformation_config.DATA_TRANSFORMATION_ARTIFACTS_DIR, exist_ok=True)
             df.to_csv(self.data_transformation_config.TRANSFORMED_FILE_PATH, index=False, header=True)
 

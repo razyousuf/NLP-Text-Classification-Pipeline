@@ -31,9 +31,9 @@ class TrainingPipeline:
         self.data_ingestion_config = DataIngestionConfig()
         self.data_validation_config = DataValidationConfig()
         self.data_transformation_config = DataTransformationConfig()
-        self.model_trainer_config = ModelTrainerConfig()
-        self.model_evaluation_config = ModelEvaluationConfig()
-        self.model_pusher_config = ModelPusherConfig()
+        #self.model_trainer_config = ModelTrainerConfig()
+        #self.model_evaluation_config = ModelEvaluationConfig()
+        #self.model_pusher_config = ModelPusherConfig()
 
 
     def start_data_ingestion(self) -> DataIngestionArtifact:
@@ -135,19 +135,19 @@ class TrainingPipeline:
                 data_validation_artifact=data_validation_artifact
             )
             
-            model_trainer_artifacts = self.start_model_trainer(data_transformation_artifacts=data_transformation_artifacts) # takes data transformation artifacts as input (transformed data)
+            # model_trainer_artifacts = self.start_model_trainer(data_transformation_artifacts=data_transformation_artifacts) # takes data transformation artifacts as input (transformed data)
 
-            model_evaluation_artifacts = self.start_model_evaluation(
-                model_trainer_artifacts=model_trainer_artifacts,
-                data_transformation_artifact=data_transformation_artifacts
-            )
+            # model_evaluation_artifacts = self.start_model_evaluation(
+            #    model_trainer_artifacts=model_trainer_artifacts,
+            #    data_transformation_artifact=data_transformation_artifacts
+            #)
 
 
             # Condition to push the best model only!
-            if not model_evaluation_artifacts.is_model_accepted:
-                raise Exception ("Trained model is NOT better that the Gcloud one")  
+            #if not model_evaluation_artifacts.is_model_accepted:
+            #    raise Exception ("Trained model is NOT better that the Gcloud one")  
 
-            model_pusher_artifacts = self.start_model_pusher()     
+            #model_pusher_artifacts = self.start_model_pusher()     
 
             logging.info("Data transformation completed successfully.")
         except Exception as e:
