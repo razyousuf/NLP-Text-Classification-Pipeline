@@ -105,7 +105,7 @@ class ModelEvaluation:
 
             trained_model_accuracy = self.evaluate_model()
 
-            logging("Fetch the model from gcloud bucket") 
+            logging.info("Fetch the model from gcloud bucket") 
             best_model_path = self.get_model_from_gcloud()
             
             logging.info("Check if best model present in the gcloud bucket or not")
