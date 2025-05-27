@@ -78,24 +78,23 @@ class ModelEvaluation:
 
             # Save best threshold alongside model
             threshold_file = os.path.join(
-                self.model_evaluation_config.BEST_MODEL_DIR_PATH,
-                self.model_evaluation_config.THRESHOLD_FILE_NAME
-            )
+                 self.model_evaluation_config.BEST_MODEL_DIR_PATH,
+                 self.model_evaluation_config.THRESHOLD_FILE_NAME
+             )
+
             #threshold_path = os.path.join(TRAINED_MODEL_DIR, "threshold.txt")
             with open(threshold_file, 'w') as f:
                 f.write(str(best_threshold))
-            logging.info(f"Saved best threshold to: {threshold_file}")
-            with open(threshold_file, "r") as f:
-                threshold = float(f.read())
+            logging.info(f"Saved best threshold to: {f}")
            
             # Convert predictions to binary labels
-            res = [1 if p[0] >= threshold else 0 for p in lstm_prediction]
+            res = [1 if p[0] >= best_threshold else 0 for p in lstm_prediction]
 
             cm = confusion_matrix(y_test, res)
             logging.info(f"Confusion Matrix: \n{cm}")
             print(cm)
 
-            return loss, accuracy, f1_scores_round, best_threshold 
+            return loss, accuracy, f1_scores_round, best_threshold
         
         except Exception as e:
             raise CustomException(e, sys) from e
@@ -172,7 +171,8 @@ class ModelEvaluation:
                     is_model_accepted = False
                     logging.info("Best model is better. Rejecting trained model.")
 
-            model_evaluation_artifacts = ModelEvaluationArtifacts(is_model_accepted=is_model_accepted)
+            model_evaluation_artifacts = ModelEvaluationArtifacts( is_model_accepted=is_model_accepted
+            )
             logging.info("Returning ModelEvaluationArtifacts")
             return model_evaluation_artifacts
 

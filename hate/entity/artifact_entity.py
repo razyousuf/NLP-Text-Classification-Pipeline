@@ -30,6 +30,7 @@ class ModelTrainerArtifacts:
 @dataclass
 class ModelEvaluationArtifacts:
     is_model_accepted: bool
+    #threshold_file_path: str
 
 @dataclass
 class ModelPusherArtifact:

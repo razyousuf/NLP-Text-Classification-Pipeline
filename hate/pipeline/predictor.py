@@ -45,6 +45,8 @@ class PredictionPipeline:
         except Exception as e:
             raise CustomException(e, sys) from e
 
+
+
     def predict(self, best_model_path: str, input_text) -> str:
         """
         Method Name:    predict
@@ -71,9 +73,10 @@ class PredictionPipeline:
             prediction = load_model.predict(pad)
             print(f"Prediction: {prediction}")
             score = float(prediction.squeeze())  # or prediction[0][0]
-
-            threshold_file = os.path.join(self.model_evaluation_config.BEST_MODEL_DIR_PATH, self.model_evaluation_config.THRESHOLD_FILE_NAME)
-            if not os.path.isfile(threshold_file):
+            threshold_file = "threshold.txt"
+            #threshold_file = os.path.join(self.get_latest_artifact_path(), MODEL_EVALUATION_ARTIFACTS_DIR, BEST_MODEL_DIR, THRESHOLD_FILE_NAME)
+            #threshold_file = os.path.join(os.getcwd(), self.model_evaluation_config.MODEL_EVALUATION_MODEL_DIR, self.model_evaluation_config.BEST_MODEL_DIR, self.model_evaluation_config.THRESHOLD_FILE_NAME)
+            if os.path.isfile(threshold_file):
                 with open(threshold_file, "r") as f:
                     threshold = float(f.read())
                 if score >= threshold:
