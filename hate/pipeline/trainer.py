@@ -62,11 +62,11 @@ class TrainingPipeline:
         except Exception as e:
             raise CustomException(e, sys) from e
 
-    def start_data_transformation(self, data_validation_artifact =  DataValidationArtifact) -> DataTransformationArtifact:
+    def start_data_transformation(self, data_validation_artifact: DataValidationArtifact) -> DataTransformationArtifact:
         logging.info("Entered the start_data_transformation method of TrainPipeline class")
         try:
             data_transformation = DataTransformation(
-                data_validation_artifact = data_validation_artifact,
+                data_validation_artifact=data_validation_artifact,
                 data_transformation_config=self.data_transformation_config
             )
 
@@ -94,12 +94,12 @@ class TrainingPipeline:
             raise CustomException(e, sys) from e
 
 
-    def start_model_evaluation(self, model_trainer_artifacts: ModelTrainerArtifacts, data_transformation_artifact: DataTransformationArtifact) -> ModelEvaluationArtifacts:
+    def start_model_evaluation(self, model_trainer_artifacts: ModelTrainerArtifacts, data_transformation_artifacts: DataTransformationArtifact) -> ModelEvaluationArtifacts:
         logging.info("Entered the start_model_evaluation method of TrainPipeline class")
         try:
             model_evaluation = ModelEvaluation(
                 model_evaluation_config=self.model_evaluation_config,
-                data_transformation_artifact=data_transformation_artifact,
+                data_transformation_artifacts=data_transformation_artifacts,
                 model_trainer_artifacts=model_trainer_artifacts
             )
 
@@ -139,7 +139,7 @@ class TrainingPipeline:
 
             model_evaluation_artifacts = self.start_model_evaluation(
                 model_trainer_artifacts=model_trainer_artifacts,
-                data_transformation_artifact=data_transformation_artifacts
+                data_transformation_artifacts=data_transformation_artifacts
             )
 
 

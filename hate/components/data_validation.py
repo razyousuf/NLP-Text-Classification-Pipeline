@@ -67,7 +67,7 @@ class DataValidation:
                 is_validated=True
             )
 
-            logging.info("Data validation completed successfully.")
+            logging.info(f"Data validation completed successfully for {dataset_key}.")
             return data_validation_artifact
 
         except Exception as e:
