@@ -14,9 +14,7 @@ from hate.entity.artifact_entity import ModelEvaluationArtifacts, ModelTrainerAr
 
 
 class ModelEvaluation:
-    def __init__(self, model_evaluation_config: ModelEvaluationConfig,
-                 model_trainer_artifacts: ModelTrainerArtifacts,
-                 data_transformation_artifacts: DataTransformationArtifact):
+    def __init__(self, model_evaluation_config: ModelEvaluationConfig, model_trainer_artifacts: ModelTrainerArtifacts, data_transformation_artifacts: DataTransformationArtifact):
         self.model_evaluation_config = model_evaluation_config
         self.model_trainer_artifacts = model_trainer_artifacts
         self.data_transformation_artifacts = data_transformation_artifacts
@@ -57,8 +55,8 @@ class ModelEvaluation:
             logging.info(f"y_test shape: {y_test.shape}")
 
             logging.info("Starting model.evaluate()")
-            accuracy = model.evaluate(test_sequences_matrix, y_test, verbose=1)
-            logging.info(f"Evaluation accuracy: {accuracy}")
+            loss, accuracy = model.evaluate(test_sequences_matrix, y_test, verbose=1)
+            logging.info(f"Evaluation Loss: {loss}, Evaluation Accuracy: {accuracy}")
 
             # Predict scores (sigmoid outputs)
             logging.info("Starting model.predict()")
@@ -75,25 +73,74 @@ class ModelEvaluation:
             # Compute F1 scores for all thresholds
             f1_scores = 2 * (precision * recall) / (precision + recall + 1e-6)
             best_threshold = thresholds[f1_scores.argmax()]
-            logging.info(f"Best F1 score: {f1_scores.max():.4f} at threshold: {best_threshold:.4f}")
+            f1_scores_round = round(f1_scores.max(), 2)
+            logging.info(f"Best F1 score: {f1_scores_round:.2f} at threshold: {best_threshold:.4f}")
 
             # Save best threshold alongside model
-            threshold_path = os.path.join(os.path.dirname(TRAINED_MODEL_DIR),"threshold.txt")
-            with open(threshold_path, 'w') as f:
+            threshold_file = os.path.join(
+                self.model_evaluation_config.BEST_MODEL_DIR_PATH,
+                self.model_evaluation_config.THRESHOLD_FILE_NAME
+            )
+            #threshold_path = os.path.join(TRAINED_MODEL_DIR, "threshold.txt")
+            with open(threshold_file, 'w') as f:
                 f.write(str(best_threshold))
-            logging.info(f"Saved best threshold to: {threshold_path}")
+            logging.info(f"Saved best threshold to: {threshold_file}")
+            with open(threshold_file, "r") as f:
+                threshold = float(f.read())
            
             # Convert predictions to binary labels
-            res = [1 if p[0] >= 0.5 else 0 for p in lstm_prediction]
+            res = [1 if p[0] >= threshold else 0 for p in lstm_prediction]
 
             cm = confusion_matrix(y_test, res)
             logging.info(f"Confusion Matrix: \n{cm}")
             print(cm)
 
-            return accuracy[1]  # assuming accuracy is the second element
+            return loss, accuracy, f1_scores_round, best_threshold 
+        
         except Exception as e:
             raise CustomException(e, sys) from e
 
+
+    import pandas as pd
+
+    def save_metrics(self, model_name: str, loss: float, accuracy: float, f1_score: float, threshold: float):
+        """
+        Saves model evaluation metrics to a CSV file.
+
+        :param model_name: Identifier for the model (e.g., 'trained_model', 'best_model')
+        :param loss: Evaluation loss
+        :param accuracy: Evaluation accuracy
+        :param f1_score: F1 score
+        :param threshold: Classification threshold used
+        :param timestamp: Current timestamp
+        :return: None
+        """
+        try:
+            metrics_path = os.path.join(self.model_evaluation_config.BEST_MODEL_DIR_PATH, self.model_evaluation_config.EVALUATION_METRICS_FILE)
+            
+
+            result_dict = {
+                "model": model_name,
+                "loss": loss,
+                "accuracy": accuracy,
+                "f1_score": f1_score,
+                "threshold": threshold,
+                "timestamp": pd.Timestamp.now()
+            }
+
+            df = pd.DataFrame([result_dict])
+
+            if os.path.exists(metrics_path):
+                df_existing = pd.read_csv(metrics_path)
+                df = pd.concat([df_existing, df], ignore_index=True)
+
+            df.to_csv(metrics_path, index=False)
+            logging.info(f"Saved evaluation metrics to: {metrics_path}")
+
+        except Exception as e:
+            raise CustomException(e, sys) from e
+
+    
     def initiate_model_evaluation(self) -> ModelEvaluationArtifacts:
         try:
             logging.info("Initiating model evaluation")
@@ -103,7 +150,9 @@ class ModelEvaluation:
             with open('tokenizer.pickle', 'rb') as handle:
                 tokenizer = pickle.load(handle)
 
-            trained_model_accuracy = self.evaluate(trained_model, tokenizer)
+            trained_loss, trained_model_accuracy, trained_f1, trained_threshold = self.evaluate(trained_model, tokenizer)
+            self.save_metrics("trained_model", trained_loss, trained_model_accuracy, trained_f1, trained_threshold)
+
 
             best_model_path = self.get_best_model_from_gcloud()
 
@@ -113,7 +162,8 @@ class ModelEvaluation:
             else:
                 logging.info("Evaluating best model from GCloud")
                 best_model = keras.models.load_model(best_model_path)
-                best_model_accuracy = self.evaluate(best_model, tokenizer)
+                best_model_loss, best_model_accuracy, best_model_f1, best_model_threshold = self.evaluate(best_model, tokenizer)
+                self.save_metrics("best_model", best_model_loss, best_model_accuracy, best_model_f1, best_model_threshold)
 
                 if trained_model_accuracy > best_model_accuracy:
                     is_model_accepted = True

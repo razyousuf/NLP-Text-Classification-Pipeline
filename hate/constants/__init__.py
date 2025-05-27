@@ -57,7 +57,8 @@ ACTIVATION = "sigmoid"
 # Model Evaluation constants
 MODEL_EVALUATION_ARTIFACTS_DIR = "ModelEvaluationArtifacts"
 BEST_MODEL_DIR = "best_model"
-MODEL_EVALUATION_FILE_NAME = "loss.csv"
+EVALUATION_METRICS_FILE = "evaluation_metrics.csv"
+THRESHOLD_FILE_NAME = "threshold.txt"
 
 MODEL_NAME = "model.h5"
 APP_HOST = "0.0.0.0"

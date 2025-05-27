@@ -72,6 +72,8 @@ class ModelEvaluationConfig:
         self.BEST_MODEL_DIR_PATH: str = os.path.join(self.MODEL_EVALUATION_MODEL_DIR, BEST_MODEL_DIR)
         self.BUCKET_NAME = BUCKET_NAME
         self.MODEL_NAME = MODEL_NAME
+        self.THRESHOLD_FILE_NAME = THRESHOLD_FILE_NAME
+        self.EVALUATION_METRICS_FILE = EVALUATION_METRICS_FILE
 
 
 # Model Pusher Config
