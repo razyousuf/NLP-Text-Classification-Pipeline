@@ -32,12 +32,12 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            docker build -t "$GCP_PROJECT_ID"/nlp-docker/app:latest .
+            docker build -t us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$ARTIFACT_REPO/app:latest .
 
       - run:
           name: Push Docker image to GCP Artifact Registry
           command: |
-            docker push "$GCP_PROJECT_ID"/nlp-docker/app:latest
+            docker push us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$ARTIFACT_REPO/app:latest
 
   continuous-delivery:
     machine: true
@@ -53,12 +53,12 @@ jobs:
       - run:
           name: Pull image from GCP Artifact Registry
           command: |
-            docker pull "$GCP_PROJECT_ID"/nlp-docker/app:latest
+            docker pull us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$ARTIFACT_REPO/app:latest
 
       - run:
           name: Run Docker image
           command: |
-            docker run -d -p 8080:8080 "$GCP_PROJECT_ID"/nlp-docker/app:latest
+            docker run -d -p 8080:8080 us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$ARTIFACT_REPO/app:latest
 
 workflows:
   CICD:
