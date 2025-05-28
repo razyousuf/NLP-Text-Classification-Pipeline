@@ -1,4 +1,6 @@
-# Return values/paths after the execution of the config_entity, as its important for the next component (where the data/file is located?) to get and use these paths.
+"""
+Return values/paths after the execution of the config_entity, as its important for the next component (where the data/file is located?) to get and use these paths.
+"""
 
 from dataclasses import dataclass
 

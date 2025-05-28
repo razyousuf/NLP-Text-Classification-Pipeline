@@ -102,9 +102,10 @@ class TrainingPipeline:
                 data_transformation_artifacts=data_transformation_artifacts,
                 model_trainer_artifacts=model_trainer_artifacts
             )
-
+        
             model_evaluation_artifacts = model_evaluation.initiate_model_evaluation()
             logging.info("Exited the start_model_evaluation method of TrainPipeline class")
+
             return model_evaluation_artifacts
 
         except Exception as e:

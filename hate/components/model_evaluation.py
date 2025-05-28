@@ -19,6 +19,11 @@ class ModelEvaluation:
         self.model_trainer_artifacts = model_trainer_artifacts
         self.data_transformation_artifacts = data_transformation_artifacts
         self.gcloud = GCloudSync()
+        try:
+            os.makedirs(self.model_evaluation_config.BEST_MODEL_DIR_PATH, exist_ok=True)
+            logging.info(f"Created directory: {self.model_evaluation_config.BEST_MODEL_DIR_PATH}")
+        except Exception as e:
+            logging.warning(f"Could not create directory {self.model_evaluation_config.BEST_MODEL_DIR_PATH}: {e}")
 
     def get_best_model_from_gcloud(self) -> str:
         try:
@@ -76,17 +81,13 @@ class ModelEvaluation:
             f1_scores_round = round(f1_scores.max(), 2)
             logging.info(f"Best F1 score: {f1_scores_round:.2f} at threshold: {best_threshold:.4f}")
 
-            # Save best threshold alongside model
-            threshold_file = os.path.join(
-                 self.model_evaluation_config.BEST_MODEL_DIR_PATH,
-                 self.model_evaluation_config.THRESHOLD_FILE_NAME
-             )
-
-            #threshold_path = os.path.join(TRAINED_MODEL_DIR, "threshold.txt")
-            with open(threshold_file, 'w') as f:
-                f.write(str(best_threshold))
-            logging.info(f"Saved best threshold to: {f}")
-           
+            try:
+                with open('threshold.txt', 'w') as f:
+                    f.write(str(best_threshold))
+                logging.info(f"Saved best threshold to the file.")
+            except Exception as e:
+                logging.warning(f"Failed to save best threshold: {e}")
+                    
             # Convert predictions to binary labels
             res = [1 if p[0] >= best_threshold else 0 for p in lstm_prediction]
 
@@ -115,8 +116,12 @@ class ModelEvaluation:
         :return: None
         """
         try:
-            metrics_path = os.path.join(self.model_evaluation_config.BEST_MODEL_DIR_PATH, self.model_evaluation_config.EVALUATION_METRICS_FILE)
+            metrics_path = os.path.join(
+                self.model_evaluation_config.BEST_MODEL_DIR_PATH, 
+                self.model_evaluation_config.EVALUATION_METRICS_FILE
+                )
             
+            os.makedirs(os.path.dirname(metrics_path), exist_ok=True) # Create the above directory if it doesn't exist
 
             result_dict = {
                 "model": model_name,
@@ -128,13 +133,13 @@ class ModelEvaluation:
             }
 
             df = pd.DataFrame([result_dict])
-
-            if os.path.exists(metrics_path):
+            if os.path.isfile(metrics_path):
                 df_existing = pd.read_csv(metrics_path)
                 df = pd.concat([df_existing, df], ignore_index=True)
 
             df.to_csv(metrics_path, index=False)
             logging.info(f"Saved evaluation metrics to: {metrics_path}")
+            return
 
         except Exception as e:
             raise CustomException(e, sys) from e
@@ -162,7 +167,12 @@ class ModelEvaluation:
                 logging.info("Evaluating best model from GCloud")
                 best_model = keras.models.load_model(best_model_path)
                 best_model_loss, best_model_accuracy, best_model_f1, best_model_threshold = self.evaluate(best_model, tokenizer)
-                self.save_metrics("best_model", best_model_loss, best_model_accuracy, best_model_f1, best_model_threshold)
+                #self.save_metrics("best_model", best_model_loss, best_model_accuracy, best_model_f1, best_model_threshold)
+                if None in (best_model_loss, best_model_accuracy, best_model_f1, best_model_threshold):
+                    logging.warning("Best model evaluation failed or returned None.")
+                else:
+                    self.save_metrics("best_model", best_model_loss, best_model_accuracy, best_model_f1, best_model_threshold)
+
 
                 if trained_model_accuracy > best_model_accuracy:
                     is_model_accepted = True
@@ -171,8 +181,7 @@ class ModelEvaluation:
                     is_model_accepted = False
                     logging.info("Best model is better. Rejecting trained model.")
 
-            model_evaluation_artifacts = ModelEvaluationArtifacts( is_model_accepted=is_model_accepted
-            )
+            model_evaluation_artifacts = ModelEvaluationArtifacts(is_model_accepted=is_model_accepted)
             logging.info("Returning ModelEvaluationArtifacts")
             return model_evaluation_artifacts
 

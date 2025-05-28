@@ -56,5 +56,5 @@ async def predict(text: str = Query(...)):
         raise CustomException(e, sys) from e
 
 # Run the FastAPI app   
-# if __name__ == "__main__":
-#     uvicorn.run("app:app", host=APP_HOST, port=APP_PORT)
+#if __name__ == "__main__":
+#    uvicorn.run("main:app", host=APP_HOST, port=APP_PORT)
