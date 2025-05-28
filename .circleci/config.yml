@@ -17,11 +17,17 @@ jobs:
       - run:
           name: Install Google Cloud SDK (gcloud CLI)
           command: |
-            sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates gnupg curl
-            echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C0BA5CE6DC6315A3
-            sudo apt-get update && sudo apt-get install -y google-cloud-sdk
+            echo "Installing GCloud CLI"
+
+            apt-get update && apt-get install -y curl gnupg ca-certificates apt-transport-https
+
+            mkdir -p /usr/share/keyrings
+            curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+
+            echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
+              > /etc/apt/sources.list.d/google-cloud-sdk.list
+
+            apt-get update && apt-get install -y google-cloud-sdk
 
       - run:
           name: Authenticate Docker to GCP Artifact Registry
