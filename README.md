@@ -43,6 +43,6 @@ python app.py
 1. Setup the CircleCI
 2. Activate the 'Self-Hosted Runners' by confirming the terms
 3. Create a new project
-4. Configure EC2 instance
-5. Write the 'config.yaml' file
+4. Configure VM instance and GCR in GCP
+5. Write the 'config.yml' file
 6. setup the environment variables

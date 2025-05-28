@@ -40,8 +40,9 @@ jobs:
             docker push us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$ARTIFACT_REPO/app:latest
 
   continuous-delivery:
-    machine: true
-    resource_class: raz/nlprunner
+    machine:
+      image: ubuntu-2204:current
+      resource_class: medium
     steps:
       - run:
           name: Authenticate with GCP
