@@ -150,6 +150,6 @@ class TrainingPipeline:
 
             model_pusher_artifacts = self.start_model_pusher()     
 
-            logging.info("Data transformation completed successfully.")
+            logging.info("Training pipeline completed successfully.")
         except Exception as e:
             raise CustomException(e, sys) from e

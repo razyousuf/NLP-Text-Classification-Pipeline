@@ -101,7 +101,6 @@ class ModelEvaluation:
             raise CustomException(e, sys) from e
 
 
-    import pandas as pd
 
     def save_metrics(self, model_name: str, loss: float, accuracy: float, f1_score: float, threshold: float):
         """

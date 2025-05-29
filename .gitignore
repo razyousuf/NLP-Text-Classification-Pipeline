@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 flowchart/*
 gcp-key
+id_rsa_base64.txt
 # C extensions
 *.so
 

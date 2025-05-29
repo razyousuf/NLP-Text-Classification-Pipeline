@@ -2,11 +2,13 @@ import os
 import sys
 import pickle
 import pandas as pd
+import numpy as np
 from hate.logger import logging
 from hate.constants import *
 from hate.exception import CustomException
 
 from sklearn.model_selection import train_test_split
+from sklearn.utils import class_weight
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.preprocessing.text import Tokenizer
 from keras.utils import pad_sequences
@@ -79,8 +81,17 @@ class ModelTrainer:
         try:
             logging.info("Entered the initiate_model_trainer function ")
             x_train,x_test,y_train,y_test = self.spliting_data(csv_path=self.data_transformation_artifacts.transformed_data_path)
-            model_architecture = ModelArchitecture()   
 
+            # Compute class weights
+            class_weights = class_weight.compute_class_weight(
+                class_weight='balanced',
+                classes=np.unique(y_train),
+                y=y_train
+            )
+            class_weights = dict(enumerate(class_weights))
+
+
+            model_architecture = ModelArchitecture()   
             model = model_architecture.get_model()
 
             logging.info(f"Xtrain size is : {x_train.shape}")
@@ -102,6 +113,7 @@ class ModelTrainer:
                         batch_size=self.model_trainer_config.BATCH_SIZE, 
                         epochs = self.model_trainer_config.EPOCH, 
                         validation_split=self.model_trainer_config.VALIDATION_SPLIT, 
+                        class_weight=class_weights,
                         callbacks=[early_stopping]
                         )
             logging.info("Model training finished")

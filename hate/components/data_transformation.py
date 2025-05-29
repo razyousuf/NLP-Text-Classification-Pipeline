@@ -111,33 +111,46 @@ class DataTransformation:
             raise CustomException(e, sys) from e
 
     def concat_data_cleaning(self, text):
-        #logging.info("Entering the concat_data_cleaning method of the DataTransformation class.")
+        """
+        Cleans input text by removing noise such as punctuation, HTML tags, emojis,
+        URLs, stopwords, and performs stemming.
+        """
         try:
-            # Convert to lowercase
+            # Convert to lowercase and ensure it's a string
             text = str(text).lower()
 
-            # Clean unwanted patterns
-            text = re.sub(r'\[.*?\]', '', text)  # Remove text in square brackets
-            text = re.sub(f"[{re.escape(string.punctuation)}]", '', text)  # Remove punctuation
-            text = re.sub(r'\w*\d\w*', '', text)  # Remove words containing numbers
-            text = re.sub(r'http\S+|www\S+|https\S+', '', text)  # Remove URLs
-            text = re.sub(r'<.*?>+', '', text)  # Remove HTML tags
-            text = re.sub(r'\n', ' ', text)  # Remove new lines
-            text = re.sub(r'\s+', ' ', text).strip()  # Normalize spaces
+            # Remove URLs
+            text = re.sub(r'http\S+|www\S+|https\S+', '', text)
 
-            # Tokenize, remove stopwords
+            # Remove HTML tags
+            text = re.sub(r'<.*?>', '', text)
+
+            # Remove text in square brackets
+            text = re.sub(r'\[.*?\]', '', text)
+
+            # Remove emojis and non-ASCII characters
+            text = text.encode('ascii', 'ignore').decode('ascii')
+
+            # Remove punctuation
+            text = re.sub(rf"[{re.escape(string.punctuation)}]", '', text)
+
+            # Remove words with numbers (e.g. "covid19")
+            text = re.sub(r'\w*\d\w*', '', text)
+
+            # Remove newlines and extra spaces
+            text = re.sub(r'\s+', ' ', text).strip()
+
+            # Tokenize and remove stopwords
             tokens = [word for word in text.split() if word not in self.stop_words]
 
-            # Stem each word
+            # Apply stemming
             stemmed_tokens = [self.stemmer.stem(word) for word in tokens]
 
-            # Rejoin cleaned tokens into string
-            cleaned_text = " ".join(stemmed_tokens)
-
-            return cleaned_text
+            return ' '.join(stemmed_tokens)
 
         except Exception as e:
             raise CustomException(e, sys) from e
+
         
     def initiate_data_transformation(self) -> DataTransformationArtifact:
         try:
