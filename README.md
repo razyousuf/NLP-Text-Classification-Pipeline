@@ -4,8 +4,8 @@ This is a modular, production-ready machine learning project for detecting hate 
 
 ### 🎥 Demo on LinkedIn
 
-[![LinkedIn](https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg)](https://www.linkedin.com/feed/update/urn:li:activity:7334198043530969088/)
-A brief walkthrough of this project is available on [LinkedIn post](https://www.linkedin.com/feed/update/urn:li:activity:7334198043530969088/).
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Video_Demo-blue?logo=linkedin&style=for-the-badge)](https://www.linkedin.com/posts/raz-yousufi-7706322a3_machinelearning-nlp-mlops-activity-7334198043530969088-iNRm?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEk9_MQBNO2Hr48sSzDGlY5NnwqtWGq-vhQ)
+A brief walkthrough of this project is available on [LinkedIn post](https://www.linkedin.com/posts/raz-yousufi-7706322a3_machinelearning-nlp-mlops-activity-7334198043530969088-iNRm?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEk9_MQBNO2Hr48sSzDGlY5NnwqtWGq-vhQ).
 
 ## Pipeline Stages
 
