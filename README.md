@@ -2,6 +2,10 @@
 
 This is a modular, production-ready machine learning project for detecting hate speech in text data using deep learning. It follows a clean, stage-wise architecture with components for data ingestion, validation, transformation, model training, evaluation, and deployment. The pipeline includes GCP integration for cloud storage, model registry, and CI/CD with CircleCI for automated deployment on a GCP VM. This project ensures scalable, reproducible ML workflows suitable for real-world NLP applications.
 
+📽️ Demo
+[![LinkedIn](https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg)(https://www.linkedin.com/feed/update/urn:li:activity:7334198043530969088/)
+A brief walkthrough of this project is available on [LinkedIn post](https://www.linkedin.com/feed/update/urn:li:activity:7334198043530969088/).
+
 ## Pipeline Stages
 
 1. Data Ingestion
