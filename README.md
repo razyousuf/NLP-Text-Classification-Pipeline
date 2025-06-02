@@ -124,7 +124,7 @@ python main.py
 ```
 ---
 ## Bonus point!
-#### Kubernetes Engine Configuration
+#### Kubernetes Engine and Docker Configuration Commands/Steps
     1  clear 
     2  sudo apt-get update
     3  git clone https://github.com/razyousuf/NLP-Text-Classification-Pipeline
