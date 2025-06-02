@@ -123,7 +123,8 @@ pip install -r requirements.txt
 python main.py
 ```
 ---
-## Kubernetes Engine Configuration
+## Bonus point!
+#### Kubernetes Engine Configuration
     1  clear 
     2  sudo apt-get update
     3  git clone https://github.com/razyousuf/NLP-Text-Classification-Pipeline
