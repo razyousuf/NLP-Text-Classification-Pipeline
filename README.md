@@ -130,7 +130,7 @@ python main.py
     4  cd NLP-Text-Classification-Pipeline/
     5  ls 
     6  cat Dockerfile 
-    7  export PROJECT_ID=crypto-snow-432611-i2 # YOUR_PROJECT_ID !
+    7  export PROJECT_ID=crypto-snow-432611-i2 # `YOUR_PROJECT_ID !`
     8  docker build -t gcr.io/${PROJECT_ID}/hatespeech-app:v1 .  
     9  docker images  
     10  gcloud auth configure-docker gcr.io  
