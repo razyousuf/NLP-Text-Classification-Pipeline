@@ -113,15 +113,36 @@ $ ssh-keygen -t rsa -f ~/.ssh/gcp-key -C youremail@gmail.com
 ```bash
 conda create -n nlp python=3.10 -y
 ```
-
 ```bash
 conda activate nlp
 ```
-
 ```bash
 pip install -r requirements.txt
 ```
-
 ```bash
 python main.py
 ```
+---
+## Kubernetes Engine Configuration
+    1  clear <br/>
+    2  sudo apt-get update<br/>
+    3  git clone https://github.com/razyousuf/NLP-Text-Classification-Pipeline<br/>
+    4  cd NLP-Text-Classification-Pipeline/<br/>
+    5  ls [^2]
+    6  cat Dockerfile 
+    7  export PROJECT_ID=crypto-snow-432611-i2 # YOUR_PROJECT_ID !
+    8  docker build -t gcr.io/${PROJECT_ID}/hatespeech-app:v1 .
+    9  docker images
+   10  gcloud auth configure-docker gcr.io
+   11  docker push gcr.io/${PROJECT_ID}/hatespeech-app:v1
+   12  gcloud config set compute/zone us-central1
+   13  kubectl get pods
+   14  kubectl expose deployment hatespeech-app --type=loadbalancer --port 80 --target-port 8080
+   15  gcloud container clusters get-credentials hatespeech-cluster --region us-central1
+   16  kubectl get pods
+   17  kubectl create deployment hatespeech-app --image=gcr.io/${PROJECT_ID}/hatespeech-app:v1
+   18  kubectl get pods
+   19  kubectl expose deployment hatespeech-app --type=LoadBalancer --port=80 --target-port=8080
+   20  kubectl get services
+   21  kubectl cluster-info
+   22  kubectl get nodes
